@@ -1,31 +1,105 @@
-var start_game = document.getElementById("start");
-var frame = document.getElementById("frame");
-var player = document.getElementById("player");
-var enermy = document.getElementById("enermy");
+let config = {
+  type: Phaser.AUTO,
+  width: 1000,
+  height: 400,
+  physics: {
+      default: 'arcade',
+      arcade: {
+          gravity: { y: 500 },
+          debug: false
+      }
+  },
+  scene: {
+      preload: preload,
+      create: create,
+      update: update
+  }
+};
 
-var score_display = document.getElementById("score")
-var cloud = document.getElementById("cloud")
-var mountains = document.getElementById("mountains")
-var grass = document.getElementById("grass")
+let frame;
+let player;
+let enemy;
+let statics;
+let mountains;
+let start_text;
+let score = 0;
+let score_text;
+let grass;
 
-var game_update_rate = 100;
-var score = 0;
+let cursors;
 
-function player_start_animation() {
-  player.style.backgroundImage = "url('images/player_horse_animated.gif')"
+let game = new Phaser.Game(config);
+
+function preload ()
+{
+    this.load.image('frame', 'images/frame.png');
+    this.load.spritesheet('player', 'images/player_horse_sheet.png', { frameWidth: 325, frameHeight: 324 });
+    this.load.image('cloud', 'images/cloud.png');
+    this.load.image('mountains', 'images/mountains.png');
 }
 
-function player_stop_animation() {
-  player.style.backgroundImage = "url('images/player_horse_static.png')"
+function create () {
+  this.add.image(500, 200, 'frame').setScale(2);
+
+  //Tile sprite for parallax
+  mountains = this.add.tileSprite(500, 200, 0, 0, 'mountains').setScale(2,1);
+
+  statics = this.physics.add.staticGroup();
+  statics.create(0.5*config.width, 0.25*config.height, 'cloud');
+
+  player = this.physics.add.sprite(40, 470, 'player').setScale(0.25);
+  player.setCollideWorldBounds(true);
+  player.setBounce(0.1);
+
+    //  Our player animations, turning, walking left and walking right.
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('player', { start: 7, end: 0}),
+      frameRate: 10,
+      repeat: -1
+  });
+
+  this.anims.create({
+      key: 'turn',
+      frames: [ { key: 'player', frame: 6 } ],
+      frameRate: 20
+  });
+
+  this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('player', { start: 0, end: 7 }),
+      frameRate: 10,
+      repeat: -1
+  });
+
+  //this.physics.add.collider(player, )
+
+  cursors = this.input.keyboard.createCursorKeys();
 }
 
-function player_jump() {
-  // Add player_jump class if it doesn't exist
-  if (!player.classList.contains("player_jump")) {
-    player.classList.add("player_jump");
-    setTimeout(function () {
-      player.classList.remove("player_jump");
-    }, 1000);
+function update() {
+  if (cursors.left.isDown)
+  {
+      player.setVelocityX(-160);
+
+      player.anims.play('left', true);
+  }
+  else if (cursors.right.isDown)
+  {
+      player.setVelocityX(160);
+
+      player.anims.play('right', true);
+  }
+  else
+  {
+      player.setVelocityX(0);
+
+      player.anims.play('turn');
+  }
+
+  if (cursors.up.isDown && player.body.blocked.down)
+  {
+      player.setVelocityY(-300);
   }
 }
 
@@ -124,5 +198,3 @@ function game_start() {
     }
   }
 }
-
-start_game.addEventListener("click", game_start);
