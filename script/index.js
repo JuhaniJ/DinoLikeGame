@@ -36,6 +36,8 @@ function preload ()
   this.load.spritesheet('player', 'images/player_horse_sheet.png', { frameWidth: 325, frameHeight: 324 });
   this.load.image('cloud', 'images/cloud.png');
   this.load.image('mountains', 'images/mountains.png');
+  this.load.image('grass-small', 'images/grass_small.png');
+  this.load.image('grass-big', 'images/grass_big.png');
 }
 
 function create () {
@@ -46,11 +48,26 @@ function create () {
   frame = this.add.image(0.5*config.width, 0.5*config.height, 'frame').setDisplaySize(config.width, config.height);
   frame.setScrollFactor(0);
 
-  //Tile sprite for parallax
+  //Mountains and clouds added as Tile sprites to allow simple parallax
   mountains = this.add.tileSprite(0.5*config.width, 0.4*config.height, 0, 0, 'mountains').setDisplaySize(config.width, 0.5*config.height);
   mountains.setScrollFactor(0);
   clouds = this.add.tileSprite(0.5*config.width, 0.2*config.height, 0, 0, 'cloud').setDisplaySize(config.width, 0.3*config.height);
   clouds.setScrollFactor(0);
+
+  grass = this.physics.add.staticGroup();
+  
+  //Random grass
+  for(var i = 0; i < 20; i++) {
+    let rndX = 0.5+0.01*Phaser.Math.RND.between(0, 50);
+    let rndY = 0.9+0.01*Phaser.Math.RND.between(0, 10);
+    let grassImage = 'grass-small';
+
+    if (Phaser.Math.RND.normal > 0){
+      grassImage = 'grass-big'; 
+    }
+
+    grass.create(0.5*config.width*i*rndX, 0.8*config.height*rndY, grassImage).setDisplaySize(0.1*config.height, 0.1*config.height);  
+  }
 
   player = this.physics.add.sprite(0.5*config.width, config.height, 'player').setScale(0.25);
   player.setCollideWorldBounds(true);
