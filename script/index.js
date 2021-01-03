@@ -92,7 +92,7 @@ function create () {
   this.anims.create({
     key: 'right',
     frames: this.anims.generateFrameNumbers('player', { start: 0, end: 7 }),
-    frameRate: 10,
+    frameRate: 20,
     repeat: -1
   });
 
@@ -111,7 +111,7 @@ function update() {
   }
   else if (cursors.right.isDown) {
     player.anims.play('right', true);
-    player.setVelocityX(150);
+    player.setVelocityX(300);
   }
   else {
     player.setVelocityX(0);
